@@ -13,6 +13,7 @@ async function getGroupIdFromTokenId(tokenId: string): Promise<string|null> { //
         return tokenIdToGroupIdMap.get(tokenId);
     }
 
+
     const metadata = await client.getTokenMetadata([ tokenId ]);
     const list = metadata.getTokenMetadataList();
     if (list.length < 1) {
@@ -21,6 +22,7 @@ async function getGroupIdFromTokenId(tokenId: string): Promise<string|null> { //
 
     const item = list[0];
     const tokenType = item.getTokenType();
+
 
     // group
     if (tokenType === 0x81) {
@@ -73,7 +75,7 @@ async function attemptRedirectUtil(res: express.Response, tokenId: string, size:
             return res.sendStatus(404);
         }
 
-        return res.redirect(301, `/cards/${size}/${groupTokenId}`);
+        return res.redirect(301, `${Config.basepath}/cards/${size}/${groupTokenId}`);
     } catch (e) {
         Log.error(`${JSON.stringify(e)}`);
     }
@@ -141,7 +143,7 @@ async function init(): Promise<void> {
     router.get('/64/:tokenId',       async (req: express.Request, res: express.Response) => attemptRedirectUtil(res, req.params.tokenId, '64'));
     router.get('/128/:tokenId',      async (req: express.Request, res: express.Response) => attemptRedirectUtil(res, req.params.tokenId, '128'));
 
-    app.use('/', router);
+    app.use(Config.basepath, router);
 
     init_server(app);
 }
